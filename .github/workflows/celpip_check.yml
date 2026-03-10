@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests
+          pip install requests cloudscraper
 
       - name: Run check script
         id: celpip_check
