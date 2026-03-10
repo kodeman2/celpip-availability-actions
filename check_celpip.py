@@ -40,8 +40,9 @@ def check_celpip():
         table_html = result.get("table", "")
 
         # Logic to determine if tests are available
-        if "0 Results" in results_summary or not table_html.strip():
-            print("No available test dates found for Nigeria.")
+        # The API can return "Shows 0 options" which means no availability.
+        if "0 Results" in results_summary or "0 options" in results_summary.lower() or not table_html.strip():
+            print(f"No available test dates found for Nigeria (API said: {results_summary}).")
             return False, results_summary
         else:
             print(f"Tests found! {results_summary}")
