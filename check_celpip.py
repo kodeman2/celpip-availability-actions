@@ -24,7 +24,7 @@ def check_celpip():
         "testCity": "",
         "testType[]": "CELPIP-G", # General
         "testDate[]": "all",      # All dates
-        "testAvailable": "0",      # Show ALL Tests (Even sold-out) for testing
+        "testAvailable": "1",      # RESTORED: Only show actually available tests
         "pageNum": "1"
     }
 
@@ -39,14 +39,13 @@ def check_celpip():
         results_summary = result.get("results", "0 Results found")
         table_html = result.get("table", "")
 
-        # Logic to determine if tests are available
-        # The API can return "Shows 0 options" which means no availability.
-        if "0 Results" in results_summary or "0 options" in results_summary.lower() or not table_html.strip():
+        # CRITICAL FIX: Look for "0 options" OR "No results" OR empty table to confirm no availability
+        if "0 options" in results_summary.lower() or "0 results" in results_summary.lower() or not table_html.strip():
             print(f"No available test dates found for Nigeria (API said: {results_summary}).")
             return False, results_summary
         else:
-            print(f"Tests found! {results_summary}")
-            send_telegram_notification(f"🚀 CELPIP Test Dates Available for Nigeria!\n\n{results_summary}\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/")
+            print(f"REAL Tests found! {results_summary}")
+            send_telegram_notification(f"🚀 <b>REAL CELPIP Test Dates Available for Nigeria!</b>\n\n{results_summary}\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/")
             return True, results_summary
             
     except Exception as e:
@@ -83,9 +82,6 @@ if __name__ == "__main__":
                 f.write(f"message={message}\n")
         print(f"available=true")
         print(f"message={message}")
-        # Always try to send notification even if redundant for testing
-        print("Triggering Telegram notification attempt...")
-        send_telegram_notification(f"🔔 CELPIP Test Date Check\n\nResult: <b>{message}</b>\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/")
         sys.exit(0)
     elif available is False:
         if 'GITHUB_OUTPUT' in os.environ:
