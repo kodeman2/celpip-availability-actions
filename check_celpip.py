@@ -83,6 +83,9 @@ if __name__ == "__main__":
                 f.write(f"message={message}\n")
         print(f"available=true")
         print(f"message={message}")
+        # Always try to send notification even if redundant for testing
+        print("Triggering Telegram notification attempt...")
+        send_telegram_notification(f"🔔 CELPIP Test Date Check\n\nResult: <b>{message}</b>\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/")
         sys.exit(0)
     elif available is False:
         if 'GITHUB_OUTPUT' in os.environ:
