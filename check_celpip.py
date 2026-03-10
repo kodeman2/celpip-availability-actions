@@ -6,15 +6,19 @@ import sys
 def check_celpip():
     url = "https://www.celpip.ca/wp-content/themes/celpip/api/ajax-get-test-dates.php"
     
-    # Headers to mimic a browser
+    # Updated headers to better mimic a real browser request and avoid 403
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "en-US,en;q=0.9",
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "Referer": "https://www.celpip.ca/take-celpip/find-a-test-date/",
-        "Accept": "*/*",
         "Origin": "https://www.celpip.ca",
-        "Connection": "keep-alive"
+        "Connection": "keep-alive",
+        "Referer": "https://www.celpip.ca/take-celpip/find-a-test-date/",
+        "Sec-Fetch-Dest": "empty",
+        "Sec-Fetch-Mode": "cors",
+        "Sec-Fetch-Site": "same-origin",
     }
     
     # Payload for Nigeria
