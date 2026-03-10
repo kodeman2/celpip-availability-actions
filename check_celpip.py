@@ -8,10 +8,13 @@ def check_celpip():
     
     # Headers to mimic a browser
     headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "Referer": "https://www.celpip.ca/take-celpip/find-a-test-date/"
+        "Referer": "https://www.celpip.ca/take-celpip/find-a-test-date/",
+        "Accept": "*/*",
+        "Origin": "https://www.celpip.ca",
+        "Connection": "keep-alive"
     }
     
     # Payload for Nigeria
