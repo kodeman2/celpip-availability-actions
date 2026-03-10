@@ -24,7 +24,7 @@ def check_celpip():
         "testCity": "",
         "testType[]": "CELPIP-G", # General
         "testDate[]": "all",      # All dates
-        "testAvailable": "1",      # Show Available Tests Only
+        "testAvailable": "0",      # Show ALL Tests (Even sold-out) for testing
         "pageNum": "1"
     }
 
