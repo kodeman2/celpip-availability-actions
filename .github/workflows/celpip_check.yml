@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install requests cloudscraper
+          pip install requests cloudscraper beautifulsoup4
 
       - name: Run check script
         id: celpip_check
