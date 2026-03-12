@@ -89,10 +89,6 @@ def check_celpip():
     final_message += "\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/"
     send_telegram_notification(final_message)
     return True, f"Found {len(all_availabilities)} options across Nigeria."
-            
-    except Exception as e:
-        print(f"Error checking CELPIP: {e}")
-        return None, str(e)
 
 def send_telegram_notification(message):
     token = os.environ.get("TELEGRAM_BOT_TOKEN")
