@@ -6,7 +6,7 @@ import cloudscraper
 from bs4 import BeautifulSoup
 
 def check_celpip():
-    url = "https://www.celpip.ca/wp-content/themes/celpip/api/ajax-get-test-dates.php"
+    base_url = "https://www.celpip.ca/wp-content/themes/celpip/api/ajax-get-test-dates.php"
     
     # We use cloudscraper to handle Cloudflare challenges automatically
     scraper = cloudscraper.create_scraper(
@@ -17,37 +17,41 @@ def check_celpip():
         }
     )
     
-    # Payload for Nigeria
-    data = {
-        "online": "",
-        "testCountry": "Nigeria",
-        "testRegion": "",
-        "testCity": "",
-        "testType[]": "CELPIP-G", # General
-        "testDate[]": "all",      # All dates
-        "testAvailable": "1",      # Only show available tests
-        "pageNum": "1"
-    }
+    # We check multiple cities to ensure we don't miss anything
+    locations = [
+        {"name": "Lagos", "region": "Lagos", "city": "Lagos"},
+        {"name": "Abuja", "region": "Abuja", "city": "Abuja"},
+        {"name": "Nigeria (General)", "region": "", "city": ""}
+    ]
 
-    try:
-        response = scraper.post(url, data=data, timeout=30)
-        response.raise_for_status()
-        
-        result = response.json()
-        results_summary = result.get("results", "0 Results found")
-        table_html = result.get("table", "")
+    all_availabilities = []
+    
+    for loc in locations:
+        print(f"Checking {loc['name']}...")
+        data = {
+            "online": "",
+            "testCountry": "Nigeria",
+            "testRegion": loc['region'],
+            "testCity": loc['city'],
+            "testType[]": "CELPIP-G", # General
+            "testDate[]": "all",      # All dates
+            "testAvailable": "1",      # Only show available tests
+            "pageNum": "1"
+        }
 
-        if "0 options" in results_summary.lower() or "0 results" in results_summary.lower() or not table_html.strip():
-            print(f"No available test dates found for Nigeria (API said: {results_summary}).")
-            return False, results_summary
-        else:
-            print(f"Tests found! {results_summary}")
+        try:
+            response = scraper.post(base_url, data=data, timeout=30)
+            response.raise_for_status()
             
-            # Parse the HTML to extract specific dates and locations
+            result = response.json()
+            table_html = result.get("table", "")
+            
+            if not table_html.strip():
+                continue
+                
             soup = BeautifulSoup(table_html, 'html.parser')
             test_rows = soup.find_all('div', class_='table-body-row')
             
-            availabilities = []
             for row in test_rows:
                 try:
                     # Extract date
@@ -62,21 +66,29 @@ def check_celpip():
                     title_div = row.find('h6', class_='title')
                     location_name = title_div.get_text(strip=True) if title_div else "Unknown Location"
                     
-                    # Look for the register button - it has class 'register-button'
+                    # Look for the register button
                     register_btn = row.find('a', class_='register-button')
                     if register_btn:
-                        availabilities.append(f"📅 <b>{date_text}</b> at {time_text}\n📍 {location_name}")
+                        entry = f"📅 <b>{date_text}</b> at {time_text}\n📍 {location_name}"
+                        if entry not in all_availabilities:
+                            all_availabilities.append(entry)
                 except Exception as e:
                     print(f"Error parsing row: {e}")
                     continue
+        except Exception as e:
+            print(f"Error checking {loc['name']}: {e}")
 
-            if not availabilities:
-                print("Found rows but no actual available slots with registration links.")
-                return False, "No active registration slots found."
+    if not all_availabilities:
+        print("No active registration slots found for Nigeria.")
+        return False, "No active registration slots found."
 
-            final_message = "🚀 <b>REAL CELPIP Test Dates Available for Nigeria!</b>\n\n" + "\n\n".join(availabilities) + "\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/"
-            send_telegram_notification(final_message)
-            return True, results_summary
+    final_message = "🚀 <b>REAL CELPIP Test Dates Available for Nigeria!</b>\n\n" + "\n\n".join(all_availabilities[:20]) # Limit to top 20 to avoid telegram limits
+    if len(all_availabilities) > 20:
+        final_message += f"\n\n... and {len(all_availabilities)-20} more slots."
+        
+    final_message += "\n\nBook here: https://www.celpip.ca/take-celpip/find-a-test-date/"
+    send_telegram_notification(final_message)
+    return True, f"Found {len(all_availabilities)} options across Nigeria."
             
     except Exception as e:
         print(f"Error checking CELPIP: {e}")
