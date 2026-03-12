@@ -62,8 +62,8 @@ def check_celpip():
                     title_div = row.find('h6', class_='title')
                     location_name = title_div.get_text(strip=True) if title_div else "Unknown Location"
                     
-                    # Check if it has a register button (Double check availability)
-                    register_btn = row.find('a', class_='custom-button')
+                    # Look for the register button - it has class 'register-button'
+                    register_btn = row.find('a', class_='register-button')
                     if register_btn:
                         availabilities.append(f"📅 <b>{date_text}</b> at {time_text}\n📍 {location_name}")
                 except Exception as e:
