@@ -2,7 +2,7 @@ name: CELPIP Availability Checker
 
 on:
   schedule:
-    # Runs every 30 minutes
+    # Runs every 30 minutes.
     - cron: '*/30 * * * *'
   workflow_dispatch: # Allows manual run
 
